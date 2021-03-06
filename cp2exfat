@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+"""
+Recursively copy a directory to an exfat target
+- drops or converts invalid exfat filename characters
+"""
+
+import logging
+from pathlib import Path
+import re
+from shutil import copy2
+from typing import Union
+
+LOGGER = logging.getLogger(__name__)
+
+def exfat_safe(p : Union[str, Path]) -> Union[str, Path]:
+    """
+    Make a path exfat 'safe', leaving only valid characters
+    """
+    s = str(p)
+    drop = ['\\', '*', '?', '"', '<', '>', '|']
+    for c in drop:
+        if c in s:
+            LOGGER.info(f'Dropping {c} from {s}')
+            s = s.replace(c, '')
+            LOGGER.debug(f' => {s}')
+    to_dash = [':']
+    for c in to_dash:
+        if c in s:
+            LOGGER.info(f'Converting {c} to - in {s}')
+            s = re.sub(rf'\s*{c}(\s*)', r'\g<1>-\g<1>', s)
+            LOGGER.debug(f' => {s}')
+    return p.__class__(s)
+
+def copy_to_exfat(src : Path, dst : Path, simulate : bool) -> int:
+    """
+    Copy recursively from src to dst
+    """
+    dst = exfat_safe(dst)
+    if not dst.exists():
+        LOGGER.info(f'{dst} does not exist! Making directory.')
+        if not simulate:
+            dst.mkdir(parents=True)
+    elif dst.is_file():
+        LOGGER.error(f'{dst} already exists as a file!')
+        return 0
+
+    n = 0
+    for p in src.iterdir():
+        d = dst / exfat_safe(p.name)
+        LOGGER.debug(f'Copying {p} => {d}')
+        if p.is_dir():
+            n += copy_to_exfat(p, d, simulate)
+        else:
+            try:
+                if not simulate:
+                    copy2(p, d)
+                n += 1
+            except OSError as e:
+                LOGGER.error(f'{e}')
+            except Exception as x:
+                LOGGER.error(f'{x.args[0]}')
+
+    return n
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description='Recursively copy a directory to an exfat target'
+        )
+    parser.add_argument('source', metavar='SRC', type=Path, help='source directory')
+    parser.add_argument('destination', metavar='DST', type=Path, help='destination directory')
+    parser.add_argument('--dry-run', '-n', action='store_true', help='simulate, but do not make changes')
+    parser.add_argument('--verbosity', metavar='LEVEL', type=str, default='WARNING', help = 'logging level: CRITICAL,ERROR,[WARNING],INFO,DEBUG')
+
+    args = parser.parse_args()
+
+    LOGFORMAT = '[%(levelname)-8s] %(asctime)-15s (%(name)s) %(message)s'
+    logging.basicConfig(format=LOGFORMAT, level=args.verbosity)
+    logging.captureWarnings(True)
+
+    n = copy_to_exfat(args.source, args.destination, args.dry_run)
+    print(f'Copied {n} file(s)!' if n > 0 else 'Failed!')
