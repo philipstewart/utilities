@@ -9,7 +9,7 @@ Originally written to copy files from an ext4 filesystem to an exfat
 MicroSDXC card, where the ext4 paths may contain characters which are 
 invalid on an exfat filesystem.
 
-```shell
+```
 $ cp2exfat -h
 usage: cp2exfat [-h] [-n] [--verbosity LEVEL] SRC DST
 
