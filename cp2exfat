@@ -72,7 +72,7 @@ if __name__ == "__main__":
         )
     parser.add_argument('source', metavar='SRC', type=Path, help='source directory')
     parser.add_argument('destination', metavar='DST', type=Path, help='destination directory')
-    parser.add_argument('--dry-run', '-n', action='store_true', help='simulate, but do not make changes')
+    parser.add_argument('-n', '--dry-run', action='store_true', help='simulate, but do not make changes')
     parser.add_argument('--verbosity', metavar='LEVEL', type=str, default='WARNING', help = 'logging level: CRITICAL,ERROR,[WARNING],INFO,DEBUG')
 
     args = parser.parse_args()

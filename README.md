@@ -11,7 +11,7 @@ invalid on an exfat filesystem.
 
 ```shell
 $ cp2exfat -h
-usage: cp2exfat [-h] [--dry-run] [--verbosity LEVEL] SRC DST
+usage: cp2exfat [-h] [-n] [--verbosity LEVEL] SRC DST
 
 Recursively copy a directory to an exfat target
 
@@ -21,7 +21,7 @@ positional arguments:
 
 optional arguments:
   -h, --help         show this help message and exit
-  --dry-run, -n      simulate, but do not make changes
+  -n, --dry-run      simulate, but do not make changes
   --verbosity LEVEL  logging level: CRITICAL,ERROR,[WARNING],INFO,DEBUG
 ```
 
