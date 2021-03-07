@@ -1,12 +1,12 @@
 # Random utilities
 
-Small utilities written if I have failed to find a suitable alternative
-when required.
+Small utilities written when I have failed to find a suitable 
+alternative when needed.
 
 ## cp2exfat
 
 Originally written to copy files from an ext4 filesystem to an exfat 
-MicroSDXC card where the ext4 paths may contain characters which are 
+MicroSDXC card, where the ext4 paths may contain characters which are 
 invalid on an exfat filesystem.
 
 ```shell
@@ -26,3 +26,7 @@ optional arguments:
 ```
 
 Requires Python 3.
+
+n.b. The morning after, it feels like there should be a simpler solution 
+to this, either using `rsync` or piping `find SRC -type f` via `tr [-d]` 
+to `cp`.
