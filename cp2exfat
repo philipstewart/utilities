@@ -37,7 +37,6 @@ def copy_to_exfat(src : Path, dst : Path, simulate : bool) -> int:
     """
     Copy recursively from src to dst
     """
-    dst = exfat_safe(dst)
     if not dst.exists():
         LOGGER.info(f'{dst} does not exist! Making directory.')
         if not simulate:
@@ -81,5 +80,5 @@ if __name__ == "__main__":
     logging.basicConfig(format=LOGFORMAT, level=args.verbosity)
     logging.captureWarnings(True)
 
-    n = copy_to_exfat(args.source, args.destination, args.dry_run)
+    n = copy_to_exfat(args.source, exfat_safe(args.destination), args.dry_run)
     print(f'Copied {n} file(s)!' if n > 0 else 'Failed!')
